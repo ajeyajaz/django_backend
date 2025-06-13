@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+</head>
+<body>
+  <h2>User Registration</h2>
+  <form id="registerForm">
+    <label>Username:</label><br>
+    <input type="text" name="username" required><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" name="password" required><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <div id="responseMessage"></div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch('/api/register/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          //Redirect to login page
+          document.getElementById('responseMessage').innerText = 'Registration successful! Redirecting to login...';
+          setTimeout(() => {
+            window.location.href = '/login/';
+          }, 1000); // 1000ms = 1 second
+        } else {
+          //Show validation errors
+          document.getElementById('responseMessage').innerText = JSON.stringify(result);
+        }
+      } catch (error) {
+        document.getElementById('responseMessage').innerText = 'Error occurred during registration.';
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
