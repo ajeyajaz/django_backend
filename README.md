@@ -87,50 +87,118 @@ Access and refresh tokens are stored in **HttpOnly cookies**, enabling safe auth
   {
     "message": "Login successful"
   }
+  
   ```
+# Implementation 2: Send Welcome Email After Registration (Celery + Redis)
 
 ---
 
-## 🛡️ Security Notes
+## Features
 
-* Tokens are stored in `HttpOnly`, `Secure`, `SameSite=Lax` cookies.
-* DRF reads JWT from **cookies**, not headers, via a custom authentication class.
+* Sends welcome email after successful registration in console
+* Email task runs in background using Celery
+
 
 ---
 
-## 📁 File Overview
+## 🧩 Folder Structure (Relevant Files Only)
 
 ```
-project/
-├── users/
-│   ├── views.py                  # Register, Login, Logout, API views
-│   ├── serializers.py            # Register serializer
-│   ├── authentication.py         # Custom CookieJWTAuthentication class
-│   └── templates/
-│       ├── login.html
-│       └── register.html
-├── settings.py
-├── urls.py
-└── manage.py
+project_name/
+├── project_name/
+│   ├── __init__.py        # Initializes Celery app
+│   └── celery.py          # Celery config
+├── your_app/
+│   ├── views.py           # RegisterApiView
+│   ├── tasks.py           # Celery email task
+│   ├── serializers.py     # RegisterSerializer
+├── manage.py
 ```
-
-## 👤 Author
-
-**Ajay H.**
-Backend Developer | Django | Python | REST APIs
-
-
 
 ---
 
-## 📦 Installation
+## ⚙️ Setup Instructions
+
+### 1. Clone and Create Virtual Environment
 
 ```bash
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
-python -m venv env
-source env/bin/activate  # or env\Scripts\activate on Windows
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
-python manage.py migrate
+```
+
+### 2. Configure Email Settings in `settings.py`
+
+
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+```
+
+### 3. Start Redis Server
+
+```bash
+sudo service redis-server start
+```
+
+### 4. Start Django Server
+
+```bash
 python manage.py runserver
 ```
+
+### 5. Start Celery Worker
+
+```bash
+celery -A project_name worker --loglevel=info
+```
+
+---
+
+## 🛠️ RegisterApiView (DRF)
+
+```python
+class RegisterApiView(CreateAPIView):
+    serializer_class = RegisterSerializer
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        send_welcome_email_task.delay(user.username, user.email)
+```
+
+---
+
+## 📨 Celery Task Example
+
+```python
+@shared_task
+def send_welcome_email_task(username, email):
+    send_mail(
+        subject="Welcome to MyApp",
+        message=f"Hi {username},\n\nThanks for registering at MyApp!",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+    )
+```
+
+---
+
+## 📫 API Endpoint
+
+| Method | Endpoint         | Description         |
+| ------ | ---------------- | ------------------- |
+| POST   | `/api/register/` | Register a new user |
+
+---
+
+## 📎 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙋‍♂️ Author
+
+Built by Ajay H. For learning and demonstration purposes.
+
+
+
