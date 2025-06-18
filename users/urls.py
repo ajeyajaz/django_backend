@@ -14,8 +14,8 @@ from .views import (
 
 urlpatterns = [
 
-    path('register/', register_page, name='register'),
-    path('api/register/',RegisterApiView.as_view(),name='register-api'),
+    path('register-page/', register_page, name='register_page'),
+    path('register/',RegisterApiView.as_view(),name='register-api'),
 
     path('login/', CookieTokenLoginView.as_view(), name='token_obtain_pair'),
 
