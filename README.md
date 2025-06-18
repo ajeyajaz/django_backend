@@ -87,8 +87,12 @@ Access and refresh tokens are stored in **HttpOnly cookies**, enabling safe auth
   {
     "message": "Login successful"
   }
-  
   ```
+### 5. Register page for Django web based login
+* **URL**: `/api/register_page/`
+
+  
+
 # Implementation 2: Send Welcome Email After Registration (Celery + Redis)
 
 ---
@@ -100,19 +104,30 @@ Access and refresh tokens are stored in **HttpOnly cookies**, enabling safe auth
 
 
 ---
+# Telegram Bot + Django Backend
 
-## 🧩 Folder Structure (Relevant Files Only)
+a Telegram Bot integrated with a Django REST API using environment variables and PostgreSQL.
+
+🚀 Features
+
+Collect Telegram usernames via /start
+
+Store them in a PostgreSQL database using Django
+
+
+## 🧩 Folder Structure
 
 ```
-project_name/
-├── project_name/
-│   ├── __init__.py        # Initializes Celery app
-│   └── celery.py          # Celery config
-├── your_app/
-│   ├── views.py           # RegisterApiView
-│   ├── tasks.py           # Celery email task
-│   ├── serializers.py     # RegisterSerializer
-├── manage.py
+project_root/
+├── django_backend/
+│   ├── users/
+│   ├── backend/         # Django project
+│   ├── manage.py
+├── telegram/
+     ├── bot.py          # Telegram bot script
+├── .env                 # Environment variables
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -127,12 +142,23 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-### 2. Configure Email Settings in `settings.py`
-
-
-```python
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+### 2.env File
+Create a .env file in the root:
 ```
+  SECRET_KEY=your_django_secret_key
+  
+  # Used PostgreSQL
+  DB_NAME=your_db_name
+  DB_USER=your_db_user
+  DB_PASSWORD=your_db_password
+  DB_HOST=localhost
+  DB_PORT=5432
+  
+  BOT_TOKEN=your_telegram_bot_token
+  API_ENDPOINT=http://127.0.0.1:8000/api/telegram_user/
+
+```
+
 
 ### 3. Start Redis Server
 
@@ -145,60 +171,20 @@ sudo service redis-server start
 ```bash
 python manage.py runserver
 ```
+### 5. start Telegram Bot
 
-### 5. Start Celery Worker
+```bash
+telegram/bot.py
+```
+
+### 6. Start Celery Worker
 
 ```bash
 celery -A project_name worker --loglevel=info
 ```
 
----
 
-## 🛠️ RegisterApiView (DRF)
 
-```python
-class RegisterApiView(CreateAPIView):
-    serializer_class = RegisterSerializer
-
-    def perform_create(self, serializer):
-        user = serializer.save()
-        send_welcome_email_task.delay(user.username, user.email)
-```
-
----
-
-## 📨 Celery Task Example
-
-```python
-@shared_task
-def send_welcome_email_task(username, email):
-    send_mail(
-        subject="Welcome to MyApp",
-        message=f"Hi {username},\n\nThanks for registering at MyApp!",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-    )
-```
-
----
-
-## 📫 API Endpoint
-
-| Method | Endpoint         | Description         |
-| ------ | ---------------- | ------------------- |
-| POST   | `/api/register/` | Register a new user |
-
----
-
-## 📎 License
-
-This project is licensed under the MIT License.
-
----
-
-## 🙋‍♂️ Author
-
-Built by Ajay H. For learning and demonstration purposes.
 
 
 
