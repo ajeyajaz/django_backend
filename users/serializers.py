@@ -1,6 +1,8 @@
 from  django.contrib.auth import  get_user_model
+from .models import TelegramUser
 from  django.contrib.auth.password_validation import validate_password
 from  rest_framework import  serializers
+
 
 User = get_user_model()
 
@@ -23,6 +25,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data.get('password')
         )
         return user
+
+
+class TelegramUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TelegramUser
+        fields = '__all__'
+        read_only_fields = ['date_joined']
+
+
+
 
 
 

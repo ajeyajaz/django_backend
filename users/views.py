@@ -1,6 +1,7 @@
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer , TelegramUserSerializer
 from django.shortcuts import render
 from .tasks import send_welcome_email
+from .models import TelegramUser
 
 from  rest_framework.generics import CreateAPIView
 from  rest_framework.views import APIView
@@ -59,6 +60,18 @@ class ProtectedAPIView(APIView):
 
     def get(self,request):
         return Response({'message':'Seeing this because your are Authenticated.'})
+
+class TelegramUserCreateView(CreateAPIView):
+
+    serializer_class = TelegramUserSerializer
+
+    def perform_create(self, serializer):
+        user_id = serializer.validated_data.get("user_id")
+
+        if not TelegramUser.objects.filter(user_id=user_id).exists():
+            serializer.save()
+
+
 
 
 

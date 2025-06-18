@@ -1,15 +1,14 @@
 from  django.urls import  path
-from django.contrib.auth.views import LoginView
 
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
+
+
 from .views import (
     RegisterApiView,
     CookieTokenLoginView,
     PublicAPIView,
     ProtectedAPIView,
     register_page,
+    TelegramUserCreateView,
 
 )
 
@@ -22,6 +21,8 @@ urlpatterns = [
 
     path('public/',PublicAPIView.as_view(),name='public'),
     path('protected/',ProtectedAPIView.as_view(),name='protected'),
+
+    path('telegram_user/',TelegramUserCreateView.as_view())
 
 ]
 
