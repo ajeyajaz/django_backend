@@ -1,0 +1,23 @@
+# Django core
+django>=4.2
+
+# REST API
+djangorestframework
+
+# JWT Authentication
+djangorestframework-simplejwt
+
+# Environment variable loader
+python-dotenv
+
+# PostgreSQL database
+psycopg2-binary
+
+# Telegram bot
+python-telegram-bot==20.7
+
+# Celery for background tasks
+celery
+
+# Redis as broker
+redis
